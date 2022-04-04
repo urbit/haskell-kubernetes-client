@@ -31,6 +31,7 @@ import qualified Data.Text      as T
 import           Data.Typeable
 import           GHC.Generics
 import           GHC.TypeLits
+import Data.String (IsString (fromString))
 
 camelToWithOverrides :: Char -> Map.Map String String -> Options
 camelToWithOverrides c overrides = defaultOptions
@@ -90,12 +91,12 @@ data NamedEntity a (typeKey :: Symbol) = NamedEntity
 instance (FromJSON a, Typeable a, KnownSymbol s) =>
          FromJSON (NamedEntity a s) where
   parseJSON = withObject ("Named" <> (show $ typeOf (undefined :: a))) $ \v ->
-    NamedEntity <$> v .: "name" <*> v .: T.pack (symbolVal (Proxy :: Proxy s))
+    NamedEntity <$> v .: "name" <*> v .: fromString (symbolVal (Proxy :: Proxy s))
 
 instance (ToJSON a, KnownSymbol s) =>
          ToJSON (NamedEntity a s) where
   toJSON (NamedEntity {..}) = object
-      ["name" .= toJSON name, T.pack (symbolVal (Proxy :: Proxy s)) .= toJSON entity]
+      ["name" .= toJSON name, fromString (symbolVal (Proxy :: Proxy s)) .= toJSON entity]
 
 toMap :: [NamedEntity a s] -> Map.Map Text a
 toMap = Map.fromList . fmap (\NamedEntity {..} -> (name, entity))

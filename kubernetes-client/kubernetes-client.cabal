@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.4.
+-- This file has been generated from package.yaml by hpack version 0.34.6.
 --
 -- see: https://github.com/sol/hpack
 
@@ -45,7 +45,7 @@ library
       src
   ghc-options: -Wall
   build-depends:
-      aeson >=1.2 && < 3
+      aeson >=1.2 && <3
     , attoparsec >=0.13
     , base >=4.7 && <5.0
     , base64-bytestring
@@ -139,7 +139,7 @@ test-suite spec
   hs-source-dirs:
       test
   build-depends:
-      aeson >=1.2 && <1.6
+      aeson >=1.2 && <3
     , attoparsec >=0.13
     , base >=4.7 && <5.0
     , base64-bytestring
