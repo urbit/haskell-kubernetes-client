@@ -93,11 +93,11 @@ fetchToken auth@(OIDCAuth{..}) = do
       tokenEndpoint <- fetchTokenEndpoint mgr auth
       tokenURI <- parseURI strictURIParserOptions (Text.encodeUtf8 tokenEndpoint)
                   & either (throwM . OIDCURIException) pure
-      let oauth = OAuth2{ oauthClientId = clientID
-                        , oauthClientSecret = Just clientSecret
-                        , oauthAccessTokenEndpoint = tokenURI
-                        , oauthOAuthorizeEndpoint = tokenURI
-                        , oauthCallback = Nothing
+      let oauth = OAuth2{ oauth2ClientId = clientID
+                        , oauth2ClientSecret = Just clientSecret
+                        , oauth2AccessTokenEndpoint = tokenURI
+                        , oauth2OAuthorizeEndpoint = tokenURI
+                        , oauth2Callback = Nothing
                         }
       oauthToken <- refreshAccessToken mgr oauth (RefreshToken token)
                     >>= either (throwM . OIDCOAuthException) pure
