@@ -5,6 +5,7 @@ module Kubernetes.Client.Auth.OIDC
   (oidcAuth, OIDCCache, cachedOIDCAuth)
 where
 
+import Control.Monad.Except (runExceptT)
 import Control.Applicative
 import Control.Concurrent.STM
 import Control.Exception.Safe                (Exception, throwM)
@@ -93,14 +94,18 @@ fetchToken auth@(OIDCAuth{..}) = do
       tokenEndpoint <- fetchTokenEndpoint mgr auth
       tokenURI <- parseURI strictURIParserOptions (Text.encodeUtf8 tokenEndpoint)
                   & either (throwM . OIDCURIException) pure
+
       let oauth = OAuth2{ oauth2ClientId = clientID
                         , oauth2ClientSecret = Just clientSecret
-                        , oauth2AccessTokenEndpoint = tokenURI
-                        , oauth2OAuthorizeEndpoint = tokenURI
-                        , oauth2Callback = Nothing
+                        , oauth2AuthorizeEndpoint = tokenURI
+                        , oauth2TokenEndpoint = tokenURI
+                        , oauth2RedirectUri = tokenURI
                         }
-      oauthToken <- refreshAccessToken mgr oauth (RefreshToken token)
-                    >>= either (throwM . OIDCOAuthException) pure
+
+      oauthToken <-
+        runExceptT (refreshAccessToken mgr oauth (RefreshToken token))
+          >>= either (throwM . OIDCOAuthException) pure
+
       case OAuth.idToken oauthToken of
         Nothing -> throwM $ OIDCGetTokenException "token response did not contain an id_token, either the scope \"openid\" wasn't requested upon login, or the provider doesn't support id_tokens as part of the refresh response."
         Just (IdToken t) -> do
