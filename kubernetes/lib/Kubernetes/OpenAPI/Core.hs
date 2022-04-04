@@ -428,7 +428,7 @@ _applyAuthMethods req config@(KubernetesClientConfig {configAuthMethods = as}) =
 -- * Utils
 
 -- | Removes Null fields.  (OpenAPI-Specification 2.0 does not allow Null in JSON)
-_omitNulls :: [(Text, A.Value)] -> A.Value
+_omitNulls :: [(a, A.Value)] -> A.Value
 _omitNulls = A.object . P.filter notNull
   where
     notNull (_, A.Null) = False
