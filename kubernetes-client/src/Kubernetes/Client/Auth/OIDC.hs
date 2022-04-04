@@ -96,7 +96,7 @@ fetchToken auth@(OIDCAuth{..}) = do
                   & either (throwM . OIDCURIException) pure
 
       let oauth = OAuth2{ oauth2ClientId = clientID
-                        , oauth2ClientSecret = Just clientSecret
+                        , oauth2ClientSecret = clientSecret
                         , oauth2AuthorizeEndpoint = tokenURI
                         , oauth2TokenEndpoint = tokenURI
                         , oauth2RedirectUri = tokenURI
